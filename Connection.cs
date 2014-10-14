@@ -29,7 +29,7 @@ namespace DelugeAPI
             if (port.HasValue)
                 arg += " " + port.Value;
 
-            string response = RunCommand(arg).Trim();
+            string response = RunCommand(arg);
 
             if (response.Length > 0)
                 throw new ApplicationException(response);
@@ -42,7 +42,7 @@ namespace DelugeAPI
             if (!connected)
                 return;
 
-            string response = RunCommand("exit").Trim();
+            string response = RunCommand("exit");
 
             if (response.Length > 0)
                 throw new ApplicationException(response);
@@ -59,7 +59,7 @@ namespace DelugeAPI
                 UseShellExecute = false
             });
             p.WaitForExit();
-            return p.StandardOutput.ReadToEnd();
+            return p.StandardOutput.ReadToEnd().Trim();
         }
     }
 }
