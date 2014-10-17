@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,6 +11,25 @@ namespace DelugeAPI
 {
     public class Connection
     {
+        private static CultureInfo doublesCulture = new CultureInfo("en-US");
+
+        private static long parseSize(string sizeString)
+        {
+            Match m = Regex.Match(sizeString, @"(?<size>[0-9]+\.[0-9]+) (?<sizeinfo>[KMG]iB)");
+
+            double size = double.Parse(m.Groups["size"].Value, doublesCulture);
+            switch (m.Groups["sizeinfo"].Value.ToLower())
+            {
+                case "kib": size *= 1024; break;
+                case "mib": size *= 1024 * 1024; break;
+                case "gib": size *= 1024 * 1024 * 1024; break;
+                default:
+                    throw new ArgumentException("Unknown size-modifier: " + m.Groups["sizeinfo"].Value);
+            }
+
+            return (long)Math.Round(size);
+        }
+
         private bool connected;
         private string remote;
         private int? port;
@@ -64,11 +84,30 @@ namespace DelugeAPI
 
         private static TorrentInfo parseTorrentInfo(string torrentInfoString)
         {
-            throw new NotImplementedException();
+            var m = Regex.Match(torrentInfoString, @"^(?<main>(:?[^:])*)::Files(?<files>(:?[^:])*)::");
+
+            string[] info = m.Groups["main"].Value.Trim().Split('\n');
+
+            string name = info[0].Substring("Name: ".Length);
+            string id = info[1].Substring("ID: ".Length);
+            long size = parseSize(Regex.Match(info[4], @"Size: ([0-9]+\.[0-9]+ [KMG]iB/)?(?<size>[0-9]+\.[0-9]+ [KMG]iB)").Groups["size"].Value);
+
+            var progressM = info.Length < 8 ? null : Regex.Match(info[7], @"Progress: (?<progress>[0-9]+\.[0-9]+)%");
+            double progress = (progressM != null && progressM.Success) ? double.Parse(progressM.Groups["progress"].Value) : 100.0;
+
+            var files = from f in m.Groups["files"].Value.Trim().Split('\n')
+                        select parseTorrentFileInfo(f.Trim());
+
+            return new TorrentInfo(name, id, size, progress, files);
         }
         private static TorrentInfo.FileInfo parseTorrentFileInfo(string torrentFileInfoString)
         {
-            throw new NotImplementedException();
+            var m = Regex.Match(torrentFileInfoString, @"(?<file>.*) \((?<size>[0-9]+\.[0-9]+ [KMG]iB)\) Progress: (?<progress>[0-9]+\.[0-9]+)% Priority: (?<priority>.+)");
+
+            return new TorrentInfo.FileInfo(
+                m.Groups["file"].Value,
+                parseSize(m.Groups["size"].Value),
+                double.Parse(m.Groups["progress"].Value, doublesCulture));
         }
 
         public string RunCommand(params string[] args)
