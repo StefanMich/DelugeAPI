@@ -39,6 +39,11 @@ namespace DelugeAPI
             get { return progress; }
         }
 
+        public IEnumerable<FileInfo> Files
+        {
+            get { foreach (var f in files) yield return f; }
+        }
+
         public class FileInfo
         {
             private string path;
