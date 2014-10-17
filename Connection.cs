@@ -50,7 +50,7 @@ namespace DelugeAPI
             if (port.HasValue)
                 arg += " " + port.Value;
 
-            string response = RunCommand(arg);
+            string response = runCommand(arg);
 
             if (response.Length > 0)
                 throw new ApplicationException(response);
@@ -62,7 +62,7 @@ namespace DelugeAPI
             if (!connected)
                 return;
 
-            string response = RunCommand("exit");
+            string response = runCommand("exit");
 
             if (response.Length > 0)
                 throw new ApplicationException(response);
@@ -72,7 +72,7 @@ namespace DelugeAPI
 
         public TorrentInfo[] GetTorrentInfo()
         {
-            string data = RunCommand("info -v").Replace("\r", "");
+            string data = runCommand("info -v").Replace("\r", "");
             var matches = Regex.Matches(data, @"Name(:?[^:])*::(:?[^:])*::( *[^ \n][^\n]+\n?)+");
 
             TorrentInfo[] result = new TorrentInfo[matches.Count];
@@ -110,7 +110,7 @@ namespace DelugeAPI
                 double.Parse(m.Groups["progress"].Value, doublesCulture));
         }
 
-        public string RunCommand(params string[] args)
+        private string runCommand(params string[] args)
         {
             Process p = Process.Start(new ProcessStartInfo(DelugePathInfo.DelugeConsoleExe, string.Join(" ", args))
             {
