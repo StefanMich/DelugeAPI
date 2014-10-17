@@ -36,7 +36,6 @@ namespace DelugeAPI
 
             connected = true;
         }
-
         public void Disconnect()
         {
             if (!connected)
@@ -48,6 +47,22 @@ namespace DelugeAPI
                 throw new ApplicationException(response);
 
             connected = false;
+        }
+
+        public TorrentInfo[] GetTorrentInfo()
+        {
+            string data = RunCommand("info -v").Replace("\r", "");
+
+            throw new NotImplementedException();
+        }
+
+        private static TorrentInfo parseTorrentInfo(string torrentInfoString)
+        {
+            throw new NotImplementedException();
+        }
+        private static TorrentInfo.FileInfo parseTorrentFileInfo(string torrentFileInfoString)
+        {
+            throw new NotImplementedException();
         }
 
         public string RunCommand(params string[] args)
