@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace DelugeAPI
 {
+    /// <summary>
+    /// Provides methods for querying a Deluged server.
+    /// </summary>
     public class Connection
     {
         private static CultureInfo doublesCulture = new CultureInfo("en-US");
@@ -34,13 +37,21 @@ namespace DelugeAPI
         private string remote;
         private int? port;
 
-        public Connection(string remote, int? port = null)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Connection"/> class.
+        /// </summary>
+        /// <param name="remote">The remote destination. This is a network location such as 'localhost' (default) or an IP address.</param>
+        /// <param name="port">The port to use on the server running deluged, or <c><null/c> for the default port.</param>
+        public Connection(string remote = "localhost", int? port = null)
         {
             this.connected = false;
             this.remote = remote;
             this.port = port;
         }
 
+        /// <summary>
+        /// Connects this instance of <see cref="Connection"/> to its deluged server.
+        /// </summary>
         public void Connect()
         {
             if (connected)
@@ -57,6 +68,9 @@ namespace DelugeAPI
 
             connected = true;
         }
+        /// <summary>
+        /// Disconnects this instance of <see cref="Connection"/> from its deluged server.
+        /// </summary>
         public void Disconnect()
         {
             if (!connected)
@@ -70,6 +84,10 @@ namespace DelugeAPI
             connected = false;
         }
 
+        /// <summary>
+        /// Gets information about all the torrent managed by the deluged server.
+        /// </summary>
+        /// <returns>An array of the torrents managed by the deluged server.</returns>
         public TorrentInfo[] GetTorrentInfo()
         {
             string data = runCommand("info -v").Replace("\r", "");
