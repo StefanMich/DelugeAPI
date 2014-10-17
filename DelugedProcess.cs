@@ -8,17 +8,10 @@ namespace DelugeAPI
     public class DelugedProcess
     {
         private Process process;
-
-        private static ProcessStartInfo getProcessInfo()
-        {
-            return new ProcessStartInfo(DelugePathInfo.DelugedExe);
-        }
-
         private DelugedProcess()
         {
             this.process = null;
         }
-
 
         private static DelugedProcess server = new DelugedProcess();
         /// <summary>
@@ -27,6 +20,11 @@ namespace DelugeAPI
         public static DelugedProcess Server
         {
             get { return server; }
+        }
+
+        private static ProcessStartInfo getProcessInfo()
+        {
+            return new ProcessStartInfo(DelugePathInfo.DelugedExe);
         }
 
         /// <summary>
