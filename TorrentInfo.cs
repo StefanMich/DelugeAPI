@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace DelugeAPI
 {
+    /// <summary>
+    /// Represents a torrent managed by a deluge server.
+    /// </summary>
     public class TorrentInfo
     {
         private string name;
@@ -22,28 +25,46 @@ namespace DelugeAPI
             this.files = files.ToArray();
         }
 
+        /// <summary>
+        /// Gets the name of the torrent.
+        /// </summary>
         public string Name
         {
             get { return name; }
         }
+        /// <summary>
+        /// Gets the identifier of the torrent.
+        /// </summary>
         public string ID
         {
             get { return id; }
         }
+        /// <summary>
+        /// Gets the approximate size of the torrent in bytes.
+        /// </summary>
         public long Size
         {
             get { return size; }
         }
+        /// <summary>
+        /// Gets the progress of downloading the torrent in the range [0-1] where 0 represents "just started" and 1 represents "completed".
+        /// </summary>
         public double Progress
         {
             get { return progress; }
         }
 
+        /// <summary>
+        /// Gets a collection of the files that are part of this torrent.
+        /// </summary>
         public IEnumerable<FileInfo> Files
         {
             get { foreach (var f in files) yield return f; }
         }
 
+        /// <summary>
+        /// Represents a single file in a <see cref="TorrentInfo"/>.
+        /// </summary>
         public class FileInfo
         {
             private string path;
@@ -57,14 +78,23 @@ namespace DelugeAPI
                 this.progress = progress;
             }
 
+            /// <summary>
+            /// Gets the path of the file, relative to the download-path of the torrent.
+            /// </summary>
             public string Path
             {
                 get { return path; }
             }
+            /// <summary>
+            /// Gets the approximate size of the file in bytes.
+            /// </summary>
             public long Size
             {
                 get { return size; }
             }
+            /// <summary>
+            /// Gets the progress of downloading the file in the range [0-1] where 0 represents "just started" and 1 represents "completed".
+            /// </summary>
             public double Progress
             {
                 get { return progress; }
