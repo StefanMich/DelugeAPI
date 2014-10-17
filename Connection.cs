@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DelugeAPI
@@ -52,8 +53,13 @@ namespace DelugeAPI
         public TorrentInfo[] GetTorrentInfo()
         {
             string data = RunCommand("info -v").Replace("\r", "");
+            var matches = Regex.Matches(data, @"Name(:?[^:])*::(:?[^:])*::( *[^ \n][^\n]+\n?)+");
 
-            throw new NotImplementedException();
+            TorrentInfo[] result = new TorrentInfo[matches.Count];
+            for (int i = 0; i < matches.Count; i++)
+                result[i] = parseTorrentInfo(matches[i].Value);
+
+            return result;
         }
 
         private static TorrentInfo parseTorrentInfo(string torrentInfoString)
