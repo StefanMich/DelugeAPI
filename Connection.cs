@@ -116,7 +116,7 @@ namespace DelugeAPI
             var files = from f in m.Groups["files"].Value.Trim().Split('\n')
                         select parseTorrentFileInfo(f.Trim());
 
-            return new TorrentInfo(name, id, size, progress, files);
+            return new TorrentInfo(name, id, size, progress / 100.0, files);
         }
         private static TorrentInfo.FileInfo parseTorrentFileInfo(string torrentFileInfoString)
         {
@@ -125,7 +125,7 @@ namespace DelugeAPI
             return new TorrentInfo.FileInfo(
                 m.Groups["file"].Value,
                 parseSize(m.Groups["size"].Value),
-                double.Parse(m.Groups["progress"].Value, doublesCulture));
+                double.Parse(m.Groups["progress"].Value, doublesCulture) / 100.0);
         }
 
         private string runCommand(params string[] args)
