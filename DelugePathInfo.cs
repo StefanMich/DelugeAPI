@@ -10,7 +10,9 @@ namespace DelugeAPI
 
         public static bool SetPath(string directory)
         {
-            if (File.Exists(Path.Combine(directory, "deluge.exe")))
+            if (File.Exists(Path.Combine(directory, "deluge.exe")) &&
+                File.Exists(Path.Combine(directory, "deluged.exe")) &&
+                File.Exists(Path.Combine(directory, "deluge-console.exe")))
             {
                 DelugePathInfo.directory = directory;
                 return true;
