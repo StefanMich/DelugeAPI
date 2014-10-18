@@ -146,17 +146,25 @@ namespace DelugeAPI
 
         public bool AddTorrent(string path)
         {
-            var torrentsBefore = GetTorrentInfo();
+            var torrentsBefore = (from t in GetTorrentInfo() select t.ID).ToArray();
 
             runCommand(string.Format("add {0}", path));
 
-            var torrentsAfter = GetTorrentInfo();
+            int added = 0;
+            int attempts = 2;
+            while (added == 0 && attempts > 0)
+            {
+                added = (from t in GetTorrentInfo() select t.ID).Except(torrentsBefore).Count();
+                if (added > 0)
+                    break;
+                attempts--;
 
-            var added = torrentsAfter.Where(x => torrentsBefore.Contains(x));
+                System.Threading.Thread.Sleep(100);
+            }
 
-            if (added.Count() > 1)
+            if (added > 1)
                 throw new InvalidOperationException("More than one torrent was added.");
-            else if (added.Count() == 0)
+            else if (added == 0)
                 return false;
             else
                 return true;
