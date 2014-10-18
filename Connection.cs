@@ -142,5 +142,35 @@ namespace DelugeAPI
             p.WaitForExit();
             return p.StandardOutput.ReadToEnd().Trim();
         }
+
+
+        public bool AddTorrent(string path)
+        {
+            var torrentsBefore = GetTorrentInfo();
+
+            runCommand(string.Format("add {0}", path));
+
+            var torrentsAfter = GetTorrentInfo();
+
+            var added = torrentsAfter.Where(x => torrentsBefore.Contains(x));
+
+            if (added.Count() > 1)
+                throw new InvalidOperationException("More than one torrent was added.");
+            else if (added.Count() == 0)
+                return false;
+            else
+                return true;
+        }
+
+        public bool RemoveTorrent(string hash)
+        {
+            runCommand(String.Format("del {0}", hash));
+
+            List<int> torrentsAfter = new List<int>();
+
+            if (torrentsAfter.Any(x => x.ToString() == hash))
+                return false;
+            else return true;
+        }
     }
 }

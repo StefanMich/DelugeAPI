@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{72A4960F-42FC-4632-8176-C86D2DA6EF03}</ProjectGuid>
+    <ProjectGuid>{22AEA810-68D9-4F5D-968D-12CF80821167}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DelugeAPI</RootNamespace>
