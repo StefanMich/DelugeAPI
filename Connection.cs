@@ -151,16 +151,10 @@ namespace DelugeAPI
             runCommand(string.Format("add {0}", path));
 
             int added = 0;
-            int attempts = 2;
-            while (added == 0 && attempts > 0)
-            {
-                added = (from t in GetTorrentInfo() select t.ID).Except(torrentsBefore).Count();
-                if (added > 0)
-                    break;
-                attempts--;
-
-                System.Threading.Thread.Sleep(100);
-            }
+            waitForPredicate(
+                () => added > 0,
+                () => added = (from t in GetTorrentInfo() select t.ID).Except(torrentsBefore).Count()
+                );
 
             if (added > 1)
                 throw new InvalidOperationException("More than one torrent was added.");
@@ -179,6 +173,21 @@ namespace DelugeAPI
             if (torrentsAfter.Any(x => x.ToString() == hash))
                 return false;
             else return true;
+        }
+
+        private bool waitForPredicate(Func<bool> predicate, Action update, int attempts = 3)
+        {
+            update();
+
+            bool ok;
+            while (ok = predicate() && attempts > 0)
+            {
+                attempts--;
+                System.Threading.Thread.Sleep(100);
+                update();
+            }
+
+            return ok;
         }
     }
 }
