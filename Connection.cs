@@ -146,17 +146,19 @@ namespace DelugeAPI
 
         public bool AddTorrent(string path)
         {
-            var torrentsBefore = GetTorrentInfo();
+            var torrentsBefore = (from t in GetTorrentInfo() select t.ID).ToArray();
 
             runCommand(string.Format("add {0}", path));
 
-            var torrentsAfter = GetTorrentInfo();
+            int added = 0;
+            waitForPredicate(
+                () => added > 0,
+                () => added = (from t in GetTorrentInfo() select t.ID).Except(torrentsBefore).Count()
+                );
 
-            var added = torrentsAfter.Where(x => torrentsBefore.Contains(x));
-
-            if (added.Count() > 1)
+            if (added > 1)
                 throw new InvalidOperationException("More than one torrent was added.");
-            else if (added.Count() == 0)
+            else if (added == 0)
                 return false;
             else
                 return true;
@@ -166,11 +168,27 @@ namespace DelugeAPI
         {
             runCommand(String.Format("del {0}", hash));
 
-            List<int> torrentsAfter = new List<int>();
+            bool contains = true;
 
-            if (torrentsAfter.Any(x => x.ToString() == hash))
-                return false;
-            else return true;
+            return waitForPredicate(
+                () => contains == false,
+                () => contains = (from t in GetTorrentInfo() select t.ID).Contains(hash)
+                );
+        }
+
+        private bool waitForPredicate(Func<bool> predicate, Action update, int attempts = 3)
+        {
+            update();
+
+            bool ok;
+            while (ok = predicate() && attempts > 0)
+            {
+                attempts--;
+                System.Threading.Thread.Sleep(100);
+                update();
+            }
+
+            return ok;
         }
     }
 }
