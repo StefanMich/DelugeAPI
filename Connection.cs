@@ -168,11 +168,12 @@ namespace DelugeAPI
         {
             runCommand(String.Format("del {0}", hash));
 
-            List<int> torrentsAfter = new List<int>();
+            bool contains = true;
 
-            if (torrentsAfter.Any(x => x.ToString() == hash))
-                return false;
-            else return true;
+            return waitForPredicate(
+                () => contains == false,
+                () => contains = (from t in GetTorrentInfo() select t.ID).Contains(hash)
+                );
         }
 
         private bool waitForPredicate(Func<bool> predicate, Action update, int attempts = 3)
