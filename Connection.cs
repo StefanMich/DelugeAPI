@@ -120,6 +120,9 @@ namespace DelugeAPI
         }
         private static TorrentInfo.FileInfo parseTorrentFileInfo(string torrentFileInfoString)
         {
+            if (torrentFileInfoString == "")
+                return null;
+
             var m = Regex.Match(torrentFileInfoString, @"(?<file>.*) \((?<size>[0-9]+\.[0-9]+ [KMG]iB)\) Progress: (?<progress>[0-9]+\.[0-9]+)% Priority: (?<priority>.+)");
 
             return new TorrentInfo.FileInfo(
